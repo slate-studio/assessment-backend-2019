@@ -31,10 +31,10 @@ jobs:
     
     - stage: release
       name: "Release"
-      if: branch == master && !fork
+      if: "(branch = master) OR (tag =~ ^v[0-9].*$)"
       node_js: 'node'
       script:
-        - echo "Releasing"
+        - scripts/deploy.sh
 
 notifications:
   email:

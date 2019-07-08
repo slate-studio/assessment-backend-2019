@@ -1,0 +1,7 @@
+type Incident {
+	_id: String!
+	title: String!
+	assignee: String! 
+	description: String
+	status: String
+}

@@ -31,7 +31,10 @@
     "js-yaml": "^3.13.1",
     "mongoose": "^5.5.11",
     "nodemon": "^1.19.1",
-    "qs-middleware": "^1.0.3"
+    "qs-middleware": "^1.0.3",
+    "lodash": "4.17.11",
+    "graphql-import": "0.7.1",
+    "graphql-tag": "2.10.1"
   },
   "devDependencies": {
     "eslint": "5.15.3",
@@ -41,7 +44,10 @@
     "eslint-plugin-import": "^2.18.0",
     "jest": "^24.8.0",
     "coveralls": "3.0.4",
-    "@types/jest": "24.0.15"
+    "@types/jest": "24.0.15",
+    "@types/jest-when": "2.4.1",
+    "jest-when": "2.6.0",
+    "apollo-server-testing": "2.6.7"
   },
   "jest": {
     "roots": [
