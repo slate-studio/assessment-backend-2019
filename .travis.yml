@@ -27,6 +27,7 @@ jobs:
       script:
         - npm run lint
         - NODE_ENV=testing-travis jest --config ./jest-cover.json --coverage --bail --forceExit --runInBand
+        - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
     
     - stage: release
       name: "Release"
