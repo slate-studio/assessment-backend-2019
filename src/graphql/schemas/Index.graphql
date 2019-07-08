@@ -1,11 +1,6 @@
 # import Incident from './Incident.graphql'
 # import User from './User.graphql'
 
-type Query {
-	hello: String
-	incidents: [Incident]
-}
-
 type Mutation {
 	raiseIncidentToEngineerUser(title: String!, assignee: String!, description: String, status: String): Incident
 	assignIncident(data: AssignIncidentRequest!): Incident!
@@ -15,10 +10,25 @@ type Mutation {
 }
 
 type Query {
-	incident(id: ID!): Incident
+	incident(id: ID!): Incident!
+	incidents(filter: IncidentFilterInput, sort: IncidentSortInput, pagination: IncidentPageInput): [Incident!]!
 }
 
 input AssignIncidentRequest {
 	userId: ID!
 	incidentId: ID!
+}
+
+input IncidentFilterInput {
+	title: String
+	description: String
+	status: EIncidentStatusType
+}
+input IncidentSortInput {
+	field: String
+	order: Int
+}
+input IncidentPageInput {
+	pageNo: Int
+	pageSize: Int
 }

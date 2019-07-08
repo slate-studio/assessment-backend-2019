@@ -8,6 +8,7 @@ const { deleteIncident } = require('./deleteIncident');
 
 // Query
 const { incident } = require('./incident');
+const { incidents } = require('./incidents');
 
 const allResolvers = {
   raiseIncidentToEngineerUser,
@@ -15,7 +16,8 @@ const allResolvers = {
   acknowledgeIncident,
   resolveIncident,
   deleteIncident,
-  incident
+  incident,
+  incidents
 };
 
 module.exports = _.chain(allResolvers)
