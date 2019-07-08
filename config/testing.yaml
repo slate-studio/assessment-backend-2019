@@ -1,0 +1,6 @@
+nserver:
+  port: 9000
+  host: localhost
+
+db:
+  uri: 'mongodb://localhost:27020/incident-management-test'

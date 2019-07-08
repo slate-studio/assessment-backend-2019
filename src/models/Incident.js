@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const IncidentSchema = new mongoose.Schema({
   title:     {
@@ -16,8 +16,8 @@ const IncidentSchema = new mongoose.Schema({
     type: String,
     enum: ['Created', 'Acknowledged', 'Resolved']
   }
-}, { timestamps: true })
+}, { timestamps: true });
 
-const Incident = mongoose.model('Incident', IncidentSchema)
+const Incident = mongoose.model('Incident', IncidentSchema);
 
-module.exports = Incident
+module.exports = Incident;

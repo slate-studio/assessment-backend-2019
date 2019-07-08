@@ -1,0 +1,19 @@
+{
+  "roots": [
+    "<rootDir>/src",
+    "<rootDir>/test"
+  ],
+  "testRegex": ".spec.js$",
+  "testPathIgnorePatterns": [
+    "/node_modules/"
+  ],
+  "coveragePathIgnorePatterns": [
+    "/node_modules/"
+  ],
+  "collectCoverageFrom": [
+    "<rootDir>/src/**/*.js",
+    "!<rootDir>/src/**/*.d.ts",
+    "!**/node_modules/**"
+  ],
+  "testEnvironment": "node"
+}

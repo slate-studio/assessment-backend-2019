@@ -5,7 +5,22 @@
   "scripts": {
     "prestart": "docker-compose up -d",
     "start": "nodemon src/server.js",
-    "test": "jest"
+    "start:local": "nodemon src/server.js",
+    "test": "jest",
+    "cover": "NODE_ENV=testing jest --config ./jest-cover.json --coverage --bail --forceExit --runInBand",
+    "lint": "eslint src/",
+    "pretest": ""
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint src/ --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "license": "ISC",
   "dependencies": {
@@ -19,6 +34,31 @@
     "qs-middleware": "^1.0.3"
   },
   "devDependencies": {
-    "jest": "^24.8.0"
+    "eslint": "5.15.3",
+    "babel-eslint": "10.0.2",
+    "husky": "1.3.1",
+    "lint-staged": "8.1.5",
+    "eslint-plugin-import": "^2.18.0",
+    "jest": "^24.8.0",
+    "coveralls": "3.0.4",
+    "@types/jest": "24.0.15"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "testRegex": ".spec.js$",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.js",
+      "!<rootDir>/src/**/*.d.ts",
+      "!**/node_modules/**"
+    ],
+    "testEnvironment": "node"
   }
 }
