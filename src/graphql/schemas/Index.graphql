@@ -1,0 +1,11 @@
+# import Incident from './Incident.graphql'
+# import User from './User.graphql'
+
+type Query {
+	hello: String
+	incidents: [Incident]
+}
+
+type Mutation {
+	raiseIncidentToEngineerUser(title: String!, assignee: String!, description: String, status: String): Incident
+}
