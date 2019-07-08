@@ -8,4 +8,10 @@ type Query {
 
 type Mutation {
 	raiseIncidentToEngineerUser(title: String!, assignee: String!, description: String, status: String): Incident
+	assignIncident(data: AssignIncidentRequest!): Incident!
+}
+
+input AssignIncidentRequest {
+	userId: ID!
+	incidentId: ID!
 }

@@ -1,8 +1,10 @@
 const _ = require('lodash');
 const { raiseIncidentToEngineerUser } = require('./raiseIncidentToUser');
+const { assignIncident } = require('./assignIncidentToUser');
 
 const allResolvers = {
-  raiseIncidentToEngineerUser
+  raiseIncidentToEngineerUser,
+  assignIncident
 };
 
 module.exports = _.chain(allResolvers)
