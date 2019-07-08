@@ -1,6 +1,7 @@
 const gql = require('graphql-tag');
 const _ = require('lodash');
-const User = require('../src/models/User');
+const { ObjectId } = require('mongodb');
+const { User, Incident } = require('../src/models');
 const { createTestClient } = require('apollo-server-testing');
 const { randomString } = require('../src/helper');
 
@@ -31,6 +32,14 @@ mutation test($id: ID!) {
 const RESOLVE_INCIDENT_MUTATE = gql`
 mutation test($id: ID!) {
   resolveIncident(id: $id) {
+      _id, title, assignee, description, status
+  }
+}
+`;
+
+const DELETE_INCIDENT_MUTATE = gql`
+mutation test($id: ID!) {
+  deleteIncident(id: $id) {
       _id, title, assignee, description, status
   }
 }
@@ -414,6 +423,71 @@ describe('/test/app.spec.js', () => {
         });
       });
 
+    });
+
+    describe('deleteIncident', () => {
+      const sampleIncident = {
+        title: randomString(),
+        description: randomString(),
+        assignee: '',
+        status: 'Created'
+      };
+
+      beforeAll(async () => {
+        // create 2 incidents
+        const engineerUser = await User.findOne({ role: 'Engineer' });
+        sampleIncident.assignee = engineerUser._id.toString();
+
+        let actual = await mutate({
+          mutation: RAISE_INCIDENT_MUTATE,
+          variables: {
+            ...sampleIncident
+          }
+        });
+        sampleIncident._id = actual.data.raiseIncidentToEngineerUser._id;
+      });
+
+      it('when giving wrong incidentId, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: DELETE_INCIDENT_MUTATE,
+          variables: {
+            id: 'abc'
+          }
+        });
+        expect(actual.data).toStrictEqual(null);
+        expect(actual.errors[0]).toMatchObject({
+          message: 'Incident abc is not valid'
+        });
+      });
+
+      it('when giving non exist incident id, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: DELETE_INCIDENT_MUTATE,
+          variables: {
+            id: '7d1fef9f028e158d23d9ead0'
+          }
+        });
+        expect(actual.data).toStrictEqual(null);
+        expect(actual.errors[0]).toMatchObject({
+          message: `Incident 7d1fef9f028e158d23d9ead0 doesn't exist`
+        });
+      });
+
+      it('when delete incident then it should return it old info', async () => {
+        const actual = await mutate({
+          mutation: DELETE_INCIDENT_MUTATE,
+          variables: {
+            id: sampleIncident._id
+          }
+        });
+        expect(actual.data).toMatchObject({
+          deleteIncident: {
+            ...sampleIncident
+          }
+        });
+        const oldIncident = await Incident.findOne({ _id: ObjectId(sampleIncident._id) });
+        expect(oldIncident).toStrictEqual(null);
+      });
     });
   });
 });

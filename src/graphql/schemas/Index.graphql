@@ -11,6 +11,7 @@ type Mutation {
 	assignIncident(data: AssignIncidentRequest!): Incident!
 	acknowledgeIncident(id: ID!): Incident!
 	resolveIncident(id: ID!): Incident!
+	deleteIncident(id: ID!): Incident!
 }
 
 input AssignIncidentRequest {
