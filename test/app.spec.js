@@ -20,12 +20,22 @@ mutation test($data: AssignIncidentRequest!) {
 }
 `;
 
+const ACK_INCIDENT_MUTATE = gql`
+mutation test($id: ID!) {
+  acknowledgeIncident(id: $id) {
+      _id, title, assignee, description, status
+  }
+}
+`;
+
 describe('/test/app.spec.js', () => {
   let apolloServer;
+  let mutate;
 
   beforeAll(async () => {
     const serverInstance = require('../src/server').serverInstance;
     apolloServer = await serverInstance;
+    mutate = createTestClient(apolloServer).mutate;
   });
 
   describe('Incident', () => {
@@ -43,8 +53,6 @@ describe('/test/app.spec.js', () => {
       });
 
       it('when provide valid information then create new incident', async () => {
-        const { mutate } = createTestClient(apolloServer);
-
         const actual = await mutate({
           mutation: RAISE_INCIDENT_MUTATE,
           variables: {
@@ -65,7 +73,6 @@ describe('/test/app.spec.js', () => {
       });
 
       it('when not provide status then use default status', async () => {
-        const { mutate } = createTestClient(apolloServer);
 
         const actual = await mutate({
           mutation: RAISE_INCIDENT_MUTATE,
@@ -111,7 +118,6 @@ describe('/test/app.spec.js', () => {
 
         // create an incident
         sampleIncident.assignee = user1._id.toString();
-        const { mutate } = createTestClient(apolloServer);
 
         const actual = await mutate({
           mutation: RAISE_INCIDENT_MUTATE,
@@ -123,8 +129,6 @@ describe('/test/app.spec.js', () => {
       });
 
       it('when giving wrong userId, it should throw exception', async () => {
-        const { mutate } = createTestClient(apolloServer);
-
         const actual = await mutate({
           mutation: ASSIGN_INCIDENT_MUTATE,
           variables: {
@@ -141,8 +145,6 @@ describe('/test/app.spec.js', () => {
       });
 
       it('when giving wrong incidentId, it should throw exception', async () => {
-        const { mutate } = createTestClient(apolloServer);
-
         const actual = await mutate({
           mutation: ASSIGN_INCIDENT_MUTATE,
           variables: {
@@ -160,8 +162,6 @@ describe('/test/app.spec.js', () => {
 
       it('when giving not exist user it should throw exception', async () => {
         const inputUserId = '5d1fef9f128e158d23d9ead1';
-        const { mutate } = createTestClient(apolloServer);
-
         const actual = await mutate({
           mutation: ASSIGN_INCIDENT_MUTATE,
           variables: {
@@ -179,8 +179,6 @@ describe('/test/app.spec.js', () => {
 
       it('when giving not exist incident it should throw exception', async () => {
         const inputId = '5d1fef9f128e158d23d9ead1';
-        const { mutate } = createTestClient(apolloServer);
-
         const actual = await mutate({
           mutation: ASSIGN_INCIDENT_MUTATE,
           variables: {
@@ -197,8 +195,6 @@ describe('/test/app.spec.js', () => {
       });
 
       it('when giving valid userId and incidentId then assign to that user', async () => {
-        const { mutate } = createTestClient(apolloServer);
-
         const actual = await mutate({
           mutation: ASSIGN_INCIDENT_MUTATE,
           variables: {
@@ -215,6 +211,101 @@ describe('/test/app.spec.js', () => {
             "description": sampleIncident.description,
             "status": sampleIncident.status,
             "title": sampleIncident.title
+          }
+        });
+      });
+
+    });
+
+    describe('acknowledgeIncident', () => {
+      const sampleIncident = {
+        title: randomString(),
+        description: randomString(),
+        assignee: '',
+        status: 'Created'
+      };
+
+      const sampleIncident2 = {
+        title: randomString(),
+        description: randomString(),
+        assignee: '',
+        status: 'Resolved'
+      };
+
+      beforeAll(async () => {
+        // create 2 incidents
+        const engineerUser = await User.findOne({ role: 'Engineer' });
+        sampleIncident.assignee = engineerUser._id.toString();
+        sampleIncident2.assignee = engineerUser._id.toString();
+
+        let actual = await mutate({
+          mutation: RAISE_INCIDENT_MUTATE,
+          variables: {
+            ...sampleIncident
+          }
+        });
+        sampleIncident._id = actual.data.raiseIncidentToEngineerUser._id;
+
+        actual = await mutate({
+          mutation: RAISE_INCIDENT_MUTATE,
+          variables: {
+            ...sampleIncident2
+          }
+        });
+        sampleIncident2._id = actual.data.raiseIncidentToEngineerUser._id;
+
+      });
+
+      it('when giving wrong incidentId, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: ACK_INCIDENT_MUTATE,
+          variables: {
+            id: 'abc'
+          }
+        });
+        expect(actual.data).toStrictEqual(null);
+        expect(actual.errors[0]).toMatchObject({
+          message: 'Incident abc is not valid'
+        });
+      });
+
+      it('when giving non exist incident id, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: ACK_INCIDENT_MUTATE,
+          variables: {
+            id: '7d1fef9f028e158d23d9ead0'
+          }
+        });
+        expect(actual.data).toStrictEqual(null);
+        expect(actual.errors[0]).toMatchObject({
+          message: `Incident 7d1fef9f028e158d23d9ead0 doesn't exist`
+        });
+      });
+
+      it('when giving incident with status not Created, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: ACK_INCIDENT_MUTATE,
+          variables: {
+            id: sampleIncident2._id
+          }
+        });
+        expect(actual.data).toStrictEqual(null);
+        expect(actual.errors[0]).toMatchObject({
+          message: `Incident ${sampleIncident2._id} can not be acknowledged`
+        });
+      });
+
+      it('when ack incident then it should return new info', async () => {
+        const actual = await mutate({
+          mutation: ACK_INCIDENT_MUTATE,
+          variables: {
+            id: sampleIncident._id
+          }
+        });
+        expect(actual.data).toMatchObject({
+          acknowledgeIncident: {
+            ...sampleIncident,
+            status: 'Acknowledged'
           }
         });
       });
