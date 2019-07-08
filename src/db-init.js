@@ -1,4 +1,4 @@
-const { User } = require('./models')
+const { User } = require('./models');
 
 async function seedUsers() {
   await User.deleteMany({});
@@ -18,9 +18,9 @@ async function seedUsers() {
   await user1.save();
   await user2.save();
 
-  console.log('INFO: User DB seeded')
+  console.log('INFO: User DB seeded');
 }
 
 module.exports = {
   seedUsers
-}
+};
