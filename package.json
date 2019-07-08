@@ -5,8 +5,9 @@
   "scripts": {
     "prestart": "docker-compose up -d",
     "start": "nodemon src/server.js",
+    "start:local": "nodemon src/server.js",
     "test": "jest",
-    "cover": "npm run prestart && NODE_ENV=testing jest --config ./jest-cover.json --coverage --bail --forceExit --runInBand",
+    "cover": "NODE_ENV=testing jest --config ./jest-cover.json --coverage --bail --forceExit --runInBand",
     "lint": "eslint src/",
     "pretest": ""
   },

@@ -1,10 +1,11 @@
-const config           = require('config')
-const express          = require('express')
-const mongoose         = require('mongoose')
+const config = require('config')
+const express = require('express')
+const mongoose = require('mongoose')
 const { ApolloServer } = require('apollo-server-express')
-mongoose.Promise       = global.Promise
+mongoose.Promise = global.Promise
 
 const { seedUsers } = require('./db-init')
+
 
 mongoose.connect(config.get('db.uri'), { useNewUrlParser: true })
   .then(async () => {
@@ -21,10 +22,10 @@ mongoose.connect(config.get('db.uri'), { useNewUrlParser: true })
     const { host, port } = config.get('server')
 
     app.listen({ port }, () => {
-      console.log(`Server ready at http://${ host }:${ port }${ server.graphqlPath }`)
+      console.log(`Server ready at http://${host}:${port}${server.graphqlPath}`)
     })
   })
   .catch((error) => {
-    console.error(error)
-    process.exit(-1)
+    console.error(error);
+    throw error;
   })
