@@ -14,6 +14,10 @@ type Mutation {
 	deleteIncident(id: ID!): Incident!
 }
 
+type Query {
+	incident(id: ID!): Incident
+}
+
 input AssignIncidentRequest {
 	userId: ID!
 	incidentId: ID!
