@@ -45,6 +45,14 @@ mutation test($id: ID!) {
 }
 `;
 
+const INCIDENT_QUERY = gql`
+query test($id: ID!) {
+  incident(id: $id) {
+      _id, title, assignee, description, status
+  }
+}
+`;
+
 describe('/test/app.spec.js', () => {
   let apolloServer;
   let mutate;
@@ -487,6 +495,58 @@ describe('/test/app.spec.js', () => {
         });
         const oldIncident = await Incident.findOne({ _id: ObjectId(sampleIncident._id) });
         expect(oldIncident).toStrictEqual(null);
+      });
+    });
+
+    describe('read incident', () => {
+      const sampleIncident = {
+        title: randomString(),
+        description: randomString(),
+        assignee: '',
+        status: 'Created'
+      };
+
+      beforeAll(async () => {
+        // create 2 incidents
+        const engineerUser = await User.findOne({ role: 'Engineer' });
+        sampleIncident.assignee = engineerUser._id.toString();
+
+        let actual = await mutate({
+          mutation: RAISE_INCIDENT_MUTATE,
+          variables: {
+            ...sampleIncident
+          }
+        });
+        sampleIncident._id = actual.data.raiseIncidentToEngineerUser._id;
+      });
+
+      it('when giving wrong incidentId, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: INCIDENT_QUERY,
+          variables: {
+            id: 'abc'
+          }
+        });
+        expect(actual.data).toMatchObject({
+          incident: null
+        });
+        expect(actual.errors[0]).toMatchObject({
+          message: 'Incident abc is not valid'
+        });
+      });
+
+      it('when get incident then it should return incident info', async () => {
+        const actual = await mutate({
+          mutation: INCIDENT_QUERY,
+          variables: {
+            id: sampleIncident._id
+          }
+        });
+        expect(actual.data).toMatchObject({
+          incident: {
+            ...sampleIncident
+          }
+        });
       });
     });
   });
