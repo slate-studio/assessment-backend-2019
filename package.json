@@ -6,6 +6,7 @@
     "prestart": "docker-compose up -d",
     "start": "nodemon src/server.js",
     "test": "jest",
+    "cover": "NODE_ENV=testing jest --coverage --bail --forceExit",
     "lint": "eslint src/"
   },
   "lint-staged": {
@@ -37,5 +38,24 @@
     "lint-staged": "8.1.5",
     "eslint-plugin-import": "^2.18.0",
     "jest": "^24.8.0"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/test"
+    ],
+    "testRegex": ".spec.js$",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.js",
+      "!<rootDir>/src/**/*.d.ts",
+      "!**/node_modules/**"
+    ],
+    "testEnvironment": "node"
   }
 }
