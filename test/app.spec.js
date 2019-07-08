@@ -28,6 +28,14 @@ mutation test($id: ID!) {
 }
 `;
 
+const RESOLVE_INCIDENT_MUTATE = gql`
+mutation test($id: ID!) {
+  resolveIncident(id: $id) {
+      _id, title, assignee, description, status
+  }
+}
+`;
+
 describe('/test/app.spec.js', () => {
   let apolloServer;
   let mutate;
@@ -306,6 +314,102 @@ describe('/test/app.spec.js', () => {
           acknowledgeIncident: {
             ...sampleIncident,
             status: 'Acknowledged'
+          }
+        });
+      });
+
+    });
+
+    describe('resolveIncident', () => {
+      const sampleIncident = {
+        title: randomString(),
+        description: randomString(),
+        assignee: '',
+        status: 'Created'
+      };
+
+      const sampleIncident2 = {
+        title: randomString(),
+        description: randomString(),
+        assignee: '',
+        status: 'Acknowledged'
+      };
+
+      beforeAll(async () => {
+        // create 2 incidents
+        const engineerUser = await User.findOne({ role: 'Engineer' });
+        sampleIncident.assignee = engineerUser._id.toString();
+        sampleIncident2.assignee = engineerUser._id.toString();
+
+        let actual = await mutate({
+          mutation: RAISE_INCIDENT_MUTATE,
+          variables: {
+            ...sampleIncident
+          }
+        });
+        sampleIncident._id = actual.data.raiseIncidentToEngineerUser._id;
+
+        actual = await mutate({
+          mutation: RAISE_INCIDENT_MUTATE,
+          variables: {
+            ...sampleIncident2
+          }
+        });
+        sampleIncident2._id = actual.data.raiseIncidentToEngineerUser._id;
+      });
+
+      it('when giving wrong incidentId, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: RESOLVE_INCIDENT_MUTATE,
+          variables: {
+            id: 'abc'
+          }
+        });
+        expect(actual.data).toStrictEqual(null);
+        expect(actual.errors[0]).toMatchObject({
+          message: 'Incident abc is not valid'
+        });
+      });
+
+      it('when giving non exist incident id, it should throw exception', async () => {
+        const actual = await mutate({
+          mutation: RESOLVE_INCIDENT_MUTATE,
+          variables: {
+            id: '7d1fef9f028e158d23d9ead0'
+          }
+        });
+        expect(actual.data).toStrictEqual(null);
+        expect(actual.errors[0]).toMatchObject({
+          message: `Incident 7d1fef9f028e158d23d9ead0 doesn't exist`
+        });
+      });
+
+      it('when ack incident with status Created then it should return new info', async () => {
+        const actual = await mutate({
+          mutation: RESOLVE_INCIDENT_MUTATE,
+          variables: {
+            id: sampleIncident._id
+          }
+        });
+        expect(actual.data).toMatchObject({
+          resolveIncident: {
+            ...sampleIncident,
+            status: 'Resolved'
+          }
+        });
+      });
+
+      it('when ack incident with status Acknowledged then it should return new info', async () => {
+        const actual = await mutate({
+          mutation: RESOLVE_INCIDENT_MUTATE,
+          variables: {
+            id: sampleIncident2._id
+          }
+        });
+        expect(actual.data).toMatchObject({
+          resolveIncident: {
+            ...sampleIncident2,
+            status: 'Resolved'
           }
         });
       });
