@@ -53,6 +53,14 @@ query test($id: ID!) {
 }
 `;
 
+const INCIDENTS_QUERY = gql`
+query test {
+  incidents {
+      _id, title, assignee, description, status
+  }
+}
+`;
+
 describe('/test/app.spec.js', () => {
   let apolloServer;
   let mutate;
@@ -527,9 +535,7 @@ describe('/test/app.spec.js', () => {
             id: 'abc'
           }
         });
-        expect(actual.data).toMatchObject({
-          incident: null
-        });
+        expect(actual.data).toStrictEqual(null);
         expect(actual.errors[0]).toMatchObject({
           message: 'Incident abc is not valid'
         });
@@ -547,6 +553,15 @@ describe('/test/app.spec.js', () => {
             ...sampleIncident
           }
         });
+      });
+    });
+
+    describe('query list incidents', () => {
+      it('when list of incidents then return me list data', async () => {
+        const actual = await mutate({
+          mutation: INCIDENTS_QUERY
+        });
+        expect(actual.data.incidents.length).toBeGreaterThan(0);
       });
     });
   });

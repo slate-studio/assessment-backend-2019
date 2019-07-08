@@ -5,3 +5,9 @@ type Incident {
 	description: String
 	status: String
 }
+
+enum EIncidentStatusType {
+	Created
+	Acknowledged
+	Resolved 
+}
