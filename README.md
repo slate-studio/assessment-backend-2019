@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/immanuel192/assessment-backend-2019.svg?branch=master)](https://travis-ci.org/immanuel192/assessment-backend-2019)
-[![Coverage Status](https://coveralls.io/repos/github/immanuel192/assessment-backend-2019/badge.svg?branch=master)](https://coveralls.io/github/immanuel192/assessment-backend-2019?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/immanuel192/assessment-backend-2019/badge.svg?branch=master&service=github)](https://coveralls.io/github/immanuel192/assessment-backend-2019?branch=master)
 
 # Update from Trung
 - To start app: `npm run start`
