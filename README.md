@@ -1,3 +1,12 @@
+# Update from Trung
+- To start app: `npm run start`
+- To setup local working environment: 
+```sh
+npm run prestart # to build docker container for mongodb
+npm run test  # run unit test on your local
+npm run cover # to run unit test and integration test and see code coverage
+```
+
 # Slate backend test assignment (GraphQL)
 
 This repository contains boilerplate for the backend test assignment.
